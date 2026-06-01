@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kali Linux: Průvodce pro studenty</title>
+    <!-- Tailwind CSS pro stylování -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kali: {
+                            dark: '#0b0f19',
+                            panel: '#151b2b',
+                            blue: '#1f6feb',
+                            lightBlue: '#58a6ff',
+                            accent: '#00ffcc',
+                            text: '#c9d1d9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #c9d1d9;
+            overflow: hidden; /* Zabrání scrollingu během prezentace */
+        }
+        
+        /* Pozadí s jemnou mřížkou */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(31, 111, 235, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(31, 111, 235, 0.05) 1px, transparent 1px);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: scale(0.95);
+            display: flex;
+            flex-direction: column;
+            padding: 4rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-left: 4px solid #1f6feb;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            font-family: 'Fira Code', monospace;
+            color: #7ee787;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-prompt::before {
+            content: "root@kali:~# ";
+            color: #58a6ff;
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        /* Vlastní scrollbar pro dlouhé texty */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f6feb;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-grid flex flex-col h-screen font-sans antialiased text-kali-text">
+
+    <!-- Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1.5 bg-gray-800 z-50">
+        <div id="progress" class="progress-bar h-full bg-kali-lightBlue shadow-[0_0_10px_rgba(88,166,255,0.8)]" style="width: 0%;"></div>
+    </div>
+
+    <!-- Kontejner Snímků -->
+    <div id="slider" class="relative flex-1 w-full max-w-7xl mx-auto mt-8 overflow-hidden">
+        
+        <!-- Snímek 1: Úvod -->
+        <div class="slide active justify-center items-center text-center">
+            <svg class="w-32 h-32 mb-6 text-kali-blue" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+            <h1 class="text-6xl font-extrabold text-white mb-4 tracking-tight drop-shadow-lg">Kali Linux</h1>
+            <p class="text-2xl text-kali-lightBlue font-light max-w-3xl">Průmyslový standard pro penetrační testování a kybernetickou bezpečnost.</p>
+            <div class="mt-12 flex gap-4 text-sm text-gray-400 font-mono">
+                <span class="bg-kali-panel px-4 py-2 rounded border border-gray-800">Ofenzivní bezpečnost</span>
+                <span class="bg-kali-panel px-4 py-2 rounded border border-gray-800">600+ Nástrojů</span>
+                <span class="bg-kali-panel px-4 py-2 rounded border border-gray-800">Debian based</span>
+            </div>
+            <p class="absolute bottom-10 text-gray-500 animate-pulse">Stiskněte šipku doprava pro pokračování</p>
+        </div>
+
+        <!-- Snímek 2: Ubuntu vs Kali -->
+        <div class="slide justify-center">
+            <h2 class="text-4xl font-bold text-white mb-8 border-b border-gray-700 pb-4">Architektura: Ubuntu vs. Kali Linux</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-kali-panel p-8 rounded-xl border border-gray-800 shadow-xl">
+                    <h3 class="text-2xl text-orange-400 font-bold mb-4 border-b border-gray-700 pb-2">
+                        Ubuntu Linux
+                    </h3>
+                    <ul class="space-y-3 text-lg">
+                        <li class="flex items-start"><span class="text-green-400 mr-2 font-mono">>></span> General-purpose OS (vhodný pro server i desktop).</li>
+                        <li class="flex items-start"><span class="text-green-400 mr-2 font-mono">>></span> Důraz na stabilitu, uživatelskou přívětivost a vývojové prostředí.</li>
+                        <li class="flex items-start"><span class="text-green-400 mr-2 font-mono">>></span> Běžné aplikace (kancelář, web, vývoj) fungují "out of the box".</li>
+                        <li class="flex items-start"><span class="text-green-400 mr-2 font-mono">>></span> Standardní bezpečnostní modely a restrikce aktivní.</li>
+                    </ul>
+                </div>
+                <div class="bg-kali-panel p-8 rounded-xl border border-kali-blue shadow-[0_0_15px_rgba(31,111,235,0.2)]">
+                    <h3 class="text-2xl text-kali-lightBlue font-bold mb-4 border-b border-kali-blue/50 pb-2">
+                        Kali Linux
+                    </h3>
+                    <ul class="space-y-3 text-lg">
+                        <li class="flex items-start"><span class="text-kali-blue mr-2 font-mono">>></span> Úzce specializovaný OS pro penetrační testování a forenziku.</li>
+                        <li class="flex items-start"><span class="text-kali-blue mr-2 font-mono">>></span> Předinstalováno přes 600 bezpečnostních nástrojů.</li>
+                        <li class="flex items-start"><span class="text-kali-blue mr-2 font-mono">>></span> Upravené jádro (kernel) – např. podpora pro packet injection.</li>
+                        <li class="flex items-start text-red-400"><span class="mr-2 font-mono">!</span> Nevhodný jako primární desktopový operační systém.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 3: Proč ne pro denní použití? -->
+        <div class="slide justify-center">
+            <h2 class="text-4xl font-bold text-white mb-6 border-b border-gray-700 pb-4">Proč nepoužívat Kali jako primární OS?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-4">
+                    <div class="bg-kali-panel p-5 rounded-lg border-l-4 border-red-500">
+                        <strong class="text-white text-lg block mb-1">Architektonické úpravy (Stealth)</strong>
+                        <p class="text-gray-400 text-sm">Aby byly síťové útoky efektivní a systém nenápadný, Kali deaktivuje mnoho standardních obranných a síťových služeb, které jsou běžné v klasických distribucích. Na veřejných sítích je paradoxně méně chráněn.</p>
+                    </div>
+                    <div class="bg-kali-panel p-5 rounded-lg border-l-4 border-yellow-500">
+                        <strong class="text-white text-lg block mb-1">Rolling Release a Stabilita</strong>
+                        <p class="text-gray-400 text-sm">Kali poskytuje nejnovější (bleeding-edge) verze bezpečnostních nástrojů. Tyto aktualizace mohou snadno narušit stabilitu systému. Pro pentestera ve virtuálním prostředí je to akceptovatelné riziko, pro běžného uživatele kritický problém.</p>
+                    </div>
+                    <div class="bg-kali-panel p-5 rounded-lg border-l-4 border-orange-500">
+                        <strong class="text-white text-lg block mb-1">Konflikty závislostí</strong>
+                        <p class="text-gray-400 text-sm">Instalace běžného proprietárního softwaru nebo standardních balíčků často vede k tzv. "dependency hell". Systém není koncipován pro běh aplikací třetích stran mimo oblast kybernetické bezpečnosti.</p>
+                    </div>
+                </div>
+                <div class="bg-[#161b22] p-8 rounded-xl border border-gray-700 h-full flex flex-col justify-center">
+                    <h3 class="text-2xl font-bold text-kali-lightBlue mb-4 border-b border-gray-700 pb-2">Závěr</h3>
+                    <p class="text-gray-300 leading-relaxed mb-4">
+                        Kali Linux je vysoce specializovaný nástroj. Nasazení specializovaného nástroje na běžné, každodenní úlohy je technicky neefektivní a z hlediska správy systému rizikové.
+                    </p>
+                    <p class="text-gray-400 font-mono text-sm bg-gray-800/50 p-4 rounded border border-gray-700">
+                        "If you are unfamiliar with Linux generally, if you do not have at least a basic level of competence in administering a system... Kali Linux is not the distribution for you."<br>
+                        <span class="block mt-2 text-right">— Kali Linux Documentation</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 4: Virtuální Stroje -->
+        <div class="slide justify-center">
+            <h2 class="text-4xl font-bold text-white mb-6">Nasazení přes Virtuální Stroj (VM)</h2>
+            <p class="text-xl mb-8">Nejbezpečnější standard pro provozování ofenzivních distribucí je využití hypervizoru (např. VirtualBox, VMware).</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-kali-panel p-6 rounded-lg border-t-4 border-green-500">
+                    <h3 class="text-xl font-bold text-white mb-2">Izolace (Sandboxing)</h3>
+                    <p class="text-gray-400 text-sm">VM simuluje hardware uvnitř hostitelského OS. Striktně odděluje analýzu malwaru a ofenzivní nástroje od vašich osobních dat na primárním disku.</p>
+                </div>
+                <div class="bg-kali-panel p-6 rounded-lg border-t-4 border-kali-blue">
+                    <h3 class="text-xl font-bold text-white mb-2">Síťové oddělení</h3>
+                    <p class="text-gray-400 text-sm">Umožňuje simulovat virtuální sítě a cíle (např. Metasploitable) pro trénink útoků bez narušení infrastruktury školy nebo produkčního prostředí.</p>
+                </div>
+                <div class="bg-kali-panel p-6 rounded-lg border-t-4 border-purple-500">
+                    <h3 class="text-xl font-bold text-white mb-2">Správa stavu (Snapshots)</h3>
+                    <p class="text-gray-400 text-sm">Při chybné konfiguraci nebo poškození filesystému lze systém okamžitě obnovit z předem uloženého obrazu (snapshotu) do funkčního stavu.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 5: První kroky - Update -->
+        <div class="slide justify-center">
+            <h2 class="text-4xl font-bold text-white mb-6">Iniciální konfigurace: Správa balíčků</h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center mt-4">
+                <div class="w-full md:w-1/2 space-y-4">
+                    <p class="text-lg">Prvním krokem po spuštění jakéhokoliv Linuxu založeného na Debianu je synchronizace repozitářů a instalace bezpečnostních záplat.</p>
+                    
+                    <div class="bg-kali-panel p-4 rounded border-l-4 border-kali-blue">
+                        <strong class="text-white block mb-1">Architektura APT (Advanced Package Tool)</strong>
+                        <p class="text-sm text-gray-400">Příkaz <code class="text-kali-accent">update</code> nestahuje samotné programy. Aktualizuje pouze lokální databázi indexů balíčků. Až příkaz <code class="text-kali-accent">upgrade</code> provede samotné stažení a instalaci binárek.</p>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-1/2 space-y-4">
+                    <p class="text-sm text-gray-400 uppercase font-bold tracking-wider">1. Synchronizace repozitářů</p>
+                    <div class="code-block text-lg"><span class="terminal-prompt"></span>sudo apt update</div>
+                    
+                    <p class="text-sm text-gray-400 uppercase font-bold tracking-wider mt-6">2. Aktualizace závislostí a nástrojů (-y pro automatizaci)</p>
+                    <div class="code-block text-lg"><span class="terminal-prompt"></span>sudo apt upgrade -y</div>
+                    
+                    <p class="text-sm text-gray-400 uppercase font-bold tracking-wider mt-6">3. Údržba a čištění nepoužívaných knihoven</p>
+                    <div class="code-block text-lg"><span class="terminal-prompt"></span>sudo apt autoremove</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 6: Zabezpečení po instalaci -->
+        <div class="slide justify-center">
+            <h2 class="text-4xl font-bold text-white mb-6">Zabezpečení operačního systému</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-kali-panel p-6 rounded-xl border border-gray-800">
+                    <h3 class="text-2xl text-kali-lightBlue font-bold mb-3 border-b border-gray-700 pb-2">1. Rotace výchozích pověření</h3>
+                    <p class="mb-4 text-gray-300 text-sm">Současné verze Kali používají výchozí účet <code>kali</code> s heslem <code>kali</code>. Ponechání těchto hodnot představuje kritickou zranitelnost (CWE-1188).</p>
+                    <div class="code-block text-sm">
+                        <span class="terminal-prompt"></span>passwd<br>
+                        <span class="text-gray-500"># Interaktivní změna hesla pro aktuálního uživatele</span>
+                    </div>
+                </div>
+                
+                <div class="bg-kali-panel p-6 rounded-xl border border-gray-800">
+                    <h3 class="text-2xl text-kali-lightBlue font-bold mb-3 border-b border-gray-700 pb-2">2. Správa identit a oprávnění</h3>
+                    <p class="mb-4 text-gray-300 text-sm">Princip nejnižších privilegií (PoLP). Běžná práce by měla probíhat pod standardním uživatelem, root oprávnění se eskalují pouze přes <code>sudo</code>.</p>
+                    <div class="code-block text-sm">
+                        <span class="terminal-prompt"></span>adduser student_analytik<br>
+                        <span class="text-gray-500"># Přidělení člena do skupiny sudoers</span><br>
+                        <span class="terminal-prompt"></span>usermod -aG sudo student_analytik
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 7: Arzenál - Fáze útoku -->
+        <div class="slide">
+            <h2 class="text-4xl font-bold text-white mb-8">Fáze penetračního testování a nástroje</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+                <div class="bg-[#161b22] border border-gray-700 p-5 rounded hover:border-kali-blue transition-colors">
+                    <h3 class="text-lg font-bold text-white mb-2">1. Sběr informací</h3>
+                    <p class="text-sm text-gray-400 mb-4">Reconnaissance: Zjišťování IP adres, otevřených portů, subdomén a struktury sítě.</p>
+                    <ul class="text-sm space-y-1 font-mono text-kali-accent">
+                        <li>> nmap (port scanning)</li>
+                        <li>> nikto (web vulnerability)</li>
+                        <li>> amass (OSINT)</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-[#161b22] border border-gray-700 p-5 rounded hover:border-yellow-500 transition-colors">
+                    <h3 class="text-lg font-bold text-white mb-2">2. Analýza zranitelností</h3>
+                    <p class="text-sm text-gray-400 mb-4">Identifikace specifických bezpečnostních děr a chybné konfigurace.</p>
+                    <ul class="text-sm space-y-1 font-mono text-yellow-400">
+                        <li>> sqlmap (SQL injection)</li>
+                        <li>> burpsuite (web proxy)</li>
+                        <li>> wpscan</li>
+                    </ul>
+                </div>
+
+                <div class="bg-[#161b22] border border-gray-700 p-5 rounded hover:border-red-500 transition-colors">
+                    <h3 class="text-lg font-bold text-white mb-2">3. Exploitace</h3>
+                    <p class="text-sm text-gray-400 mb-4">Aktivní zneužití zranitelností za účelem získání neautorizovaného přístupu (shell).</p>
+                    <ul class="text-sm space-y-1 font-mono text-red-400">
+                        <li>> metasploit framework</li>
+                        <li>> armitage (GUI pro MSF)</li>
+                        <li>> searchsploit</li>
+                    </ul>
+                </div>
+
+                <div class="bg-[#161b22] border border-gray-700 p-5 rounded hover:border-purple-500 transition-colors">
+                    <h3 class="text-lg font-bold text-white mb-2">4. Post-exploitace</h3>
+                    <p class="text-sm text-gray-400 mb-4">Prolamování hashů, analýza dat, eskalace privilegií a zakrytí stop.</p>
+                    <ul class="text-sm space-y-1 font-mono text-purple-400">
+                        <li>> hashcat (GPGPU cracking)</li>
+                        <li>> john the ripper</li>
+                        <li>> autopsy (forensics)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 8: Úprava prostředí -->
+        <div class="slide justify-center">
+            <h2 class="text-4xl font-bold text-white mb-6">Konfigurace pracovního prostředí</h2>
+            <p class="text-xl mb-8">Optimalizace workflow pro analýzu dat a skriptování.</p>
+
+            <div class="space-y-6">
+                <div class="flex flex-col md:flex-row bg-kali-panel rounded-lg overflow-hidden border border-gray-800">
+                    <div class="bg-gray-800 p-6 md:w-1/3 border-r border-gray-700">
+                        <h3 class="text-xl font-bold text-white mb-2">Terminálový Multiplexer</h3>
+                        <p class="text-sm text-gray-400">Nástroje jako Tilix nebo Tmux umožňují asynchronní běh více procesů (skenování, logování, shell) v rámci jedné obrazovky.</p>
+                    </div>
+                    <div class="p-6 md:w-2/3 flex items-center bg-[#0d1117]">
+                        <div class="code-block w-full text-sm">
+                            <span class="terminal-prompt"></span>sudo apt install tilix -y<br>
+                            <span class="terminal-prompt"></span>tilix <span class="text-gray-500"># Inicializace GUI multiplexeru</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row bg-kali-panel rounded-lg overflow-hidden border border-gray-800">
+                    <div class="bg-gray-800 p-6 md:w-1/3 border-r border-gray-700">
+                        <h3 class="text-xl font-bold text-white mb-2">Vývojový Stack (IDE)</h3>
+                        <p class="text-sm text-gray-400">Instalace závislostí pro běh exploitů napsaných v Pythonu, správa verzí (Git) a integrované vývojové prostředí (VS Code).</p>
+                    </div>
+                    <div class="p-6 md:w-2/3 flex items-center bg-[#0d1117]">
+                        <div class="code-block w-full text-sm">
+                            <span class="terminal-prompt"></span>sudo apt install python3 pip git -y<br>
+                            <span class="text-gray-500"># Instalace VS Code z lokálního .deb balíčku:</span><br>
+                            <span class="terminal-prompt"></span>sudo apt install ./vscode.deb -y
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 9: Praktická cvičení -->
+        <div class="slide justify-center">
+            <h2 class="text-4xl font-bold text-white mb-6">Praktická Cvičení (CLI základy)</h2>
+            <p class="text-xl mb-6">Vyzkoušejte si základní analytické příkazy z prostředí terminálu:</p>
+            
+            <div class="space-y-5">
+                <div class="bg-kali-panel p-5 rounded-lg border border-gray-800">
+                    <h3 class="text-kali-accent font-bold mb-1 text-lg">1. Síťový průzkum (Nmap)</h3>
+                    <p class="text-sm text-gray-400 mb-3">Skenování otevřených portů na vyhrazeném testovacím serveru organizace Nmap.</p>
+                    <div class="code-block text-sm"><span class="terminal-prompt"></span>nmap scanme.nmap.org</div>
+                </div>
+                
+                <div class="bg-kali-panel p-5 rounded-lg border border-gray-800">
+                    <h3 class="text-kali-blue font-bold mb-1 text-lg">2. Analýza domény (Whois)</h3>
+                    <p class="text-sm text-gray-400 mb-3">Získání veřejně dostupných registračních údajů (OSINT) k doméně.</p>
+                    <div class="code-block text-sm"><span class="terminal-prompt"></span>whois github.com</div>
+                </div>
+
+                <div class="bg-kali-panel p-5 rounded-lg border border-gray-800">
+                    <h3 class="text-green-500 font-bold mb-1 text-lg">3. Sledování systémových prostředků</h3>
+                    <p class="text-sm text-gray-400 mb-3">Interaktivní monitor procesů (obdoba Správce úloh). Pro ukončení stiskněte <kbd class="bg-gray-700 px-1 rounded font-mono">Q</kbd> nebo <kbd class="bg-gray-700 px-1 rounded font-mono">Ctrl+C</kbd>.</p>
+                    <div class="code-block text-sm">
+                        <span class="terminal-prompt"></span>htop
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snímek 10: Závěr a Tipy -->
+        <div class="slide justify-center items-center text-center">
+            <h2 class="text-5xl font-bold text-white mb-6">Shrnutí</h2>
+            <p class="text-2xl text-gray-300 max-w-3xl mb-8">
+                Kybernetická bezpečnost vyžaduje neustálé vzdělávání.<br>
+                Pro dokumentaci k jakémukoliv nástroji využijte přepínač <code class="text-kali-lightBlue">--help</code> (např. <code>nmap --help</code>).
+            </p>
+            
+            <div class="bg-[#161b22] border-l-4 border-kali-blue p-8 rounded-lg max-w-2xl text-left shadow-xl">
+                <h4 class="text-kali-lightBlue font-bold text-2xl mb-4">Etický kodex a legislativa</h4>
+                <ul class="text-gray-300 space-y-3 list-disc list-inside text-lg">
+                    <li>Aktivní skenování a exploitace bez písemného svolení majitele je trestný čin.</li>
+                    <li>Své dovednosti využívejte k detekci a odstraňování zranitelností (Blue Team / Ethical Hacking).</li>
+                    <li>Experimenty provádějte výhradně v izolovaných virtuálních sítích.</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Ovládací prvky dole -->
+    <div class="fixed bottom-6 w-full flex justify-between px-8 z-50">
+        <button id="prevBtn" class="bg-kali-panel hover:bg-gray-800 text-white px-6 py-2 rounded border border-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm">
+            &larr; Zpět
+        </button>
+        <div class="text-gray-500 font-mono text-sm bg-kali-dark px-4 py-2 rounded-full border border-gray-800">
+            <span id="slideCounter">1</span> / <span id="totalSlides">X</span>
+        </div>
+        <button id="nextBtn" class="bg-kali-blue hover:bg-blue-600 text-white px-6 py-2 rounded border border-kali-blue transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm">
+            Další &rarr;
+        </button>
+    </div>
+
+    <!-- JavaScript Logika Prezentace -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const counter = document.getElementById('slideCounter');
+            const total = document.getElementById('totalSlides');
+            const progressBar = document.getElementById('progress');
+            
+            let currentSlide = 0;
+            const totalSlidesCount = slides.length;
+            total.textContent = totalSlidesCount;
+
+            function updateUI() {
+                // Skrytí všech
+                slides.forEach((slide, index) => {
+                    if(index === currentSlide) {
+                        slide.classList.add('active');
+                    } else {
+                        slide.classList.remove('active');
+                    }
+                });
+
+                // Aktualizace tlačítek
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlidesCount - 1;
+
+                // Aktualizace počítadla a progress baru
+                counter.textContent = currentSlide + 1;
+                progressBar.style.width = `${((currentSlide + 1) / totalSlidesCount) * 100}%`;
+            }
+
+            function goNext() {
+                if (currentSlide < totalSlidesCount - 1) {
+                    currentSlide++;
+                    updateUI();
+                }
+            }
+
+            function goPrev() {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateUI();
+                }
+            }
+
+            // Event Listenery na tlačítka
+            nextBtn.addEventListener('click', goNext);
+            prevBtn.addEventListener('click', goPrev);
+
+            // Klávesové zkratky
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === ' ') {
+                    goNext();
+                } else if (e.key === 'ArrowLeft') {
+                    goPrev();
+                }
+            });
+
+            // Gesta pro dotyková zařízení (swipe)
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            document.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+
+            document.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+
+            function handleSwipe() {
+                const threshold = 50;
+                if (touchStartX - touchEndX > threshold) {
+                    goNext(); // Swipe doleva -> Další
+                } else if (touchEndX - touchStartX > threshold) {
+                    goPrev(); // Swipe doprava -> Předchozí
+                }
+            }
+
+            // Inicializace
+            updateUI();
+        });
+    </script>
+</body>
+</html>
